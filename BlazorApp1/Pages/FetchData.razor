@@ -1,0 +1,56 @@
+﻿@page "/"
+
+@using BlazorApp1.Data;
+@inject ToyService toyService;
+
+<h1>Все игрушки</h1>
+
+
+@if (toys == null)
+{
+    <p>Loading....</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Имя</th>
+                <th>id</th>
+                <th>Минимальный возраст</th>
+                <th>Цена</th>
+                <th>Переход</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var toy in toys)
+            {
+                <tr class="mt-1">
+                    <td>@toy.Name</td>
+                    <td>@toy.Id</td>
+                    <td>@toy.Age</td>
+                    <td>@toy.Price</td>
+                    <td>
+                        <NavLink style="cursor: pointer" class="nav-link" href="@($"/toy/show/{toy.Id}")" Match="NavLinkMatch.All">
+                            Подробнее
+                        </NavLink>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Data.dto.ToyDto> toys;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await this.updateToys();
+    }
+
+    private async Task updateToys()
+    {
+        this.toys = await toyService.GetToys();
+    }
+}

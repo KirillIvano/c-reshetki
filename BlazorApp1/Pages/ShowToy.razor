@@ -1,0 +1,54 @@
+﻿@page "/toy/show/{Id:int}"
+
+@using BlazorApp1.Data;
+@inject ToyService toyService;
+@inject NavigationManager navigationManager;
+
+@if (toy == null)
+{
+    <p>Loading....</p>
+}
+else
+{
+    <h1>Игрушка "@toy.Name"</h1>
+
+    <div class="row">
+        <ul>
+            <li>имя: @toy.Name</li>
+            <li>id: @toy.Id</li>
+            <li>минимальный возраст: @toy.Age</li>
+            <li>цена: @toy.Price</li>
+        </ul>
+    </div>
+    <div class="row">
+        <div class="col-xs-2">
+            <NavLink class="nav-link" style="padding: 0" href="@($"/toy/update/{Id}")" Match="NavLinkMatch.All">
+                <button type="button" class="btn btn-primary">Изменить</button>
+            </NavLink>
+        </div>
+
+        <div class="col-xs-2">
+            <button type="button" class="btn btn-danger ml-1" @onclick="DeleteToy">Удалить</button>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    Data.dto.ToyDto toy;
+
+    private List<Data.dto.ToyDto> toys;
+
+    protected override async Task OnInitializedAsync()
+    {
+        toy = await toyService.GetToyById(Id);
+    }
+
+    private async void DeleteToy()
+    {
+        await toyService.DeleteToy(Id);
+        navigationManager.NavigateTo("/");
+    }
+}

@@ -1,0 +1,99 @@
+﻿@page "/toy/create"
+
+@using BlazorApp1.Data;
+@inject ToyService toyService;
+@inject NavigationManager navigationManager;
+
+<h1>Создание игрушки</h1>
+
+<div class="row">
+    <div class="col-xs-12 col-md-4">
+        <label>
+            Название
+
+            <input type="text"
+                   name="name"
+                   value="@name"
+                   @onchange="@handleNameChange"
+                   class="form-control" />
+        </label>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-xs-12 col-md-4">
+        <label>
+            Цена
+
+            <input type="number"
+                   name="price"
+                   value="@price"
+                   @onchange="@handlePriceChange"
+                   class="form-control" />
+        </label>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-12 col-md-4">
+        <label>
+            Возраст
+
+            <input type="number"
+                   name="age"
+                   value="@age"
+                   @onchange="@handleAgeChange"
+                   class="form-control" />
+        </label>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-12 col-md-4">
+        <button class="btn btn-primary" @onclick="@this.handleSubmit">Создать</button>
+    </div>
+</div>
+
+
+@code {
+    private List<Data.dto.ToyDto> toys;
+    int age = 0;
+    int price = 0;
+    string name = "";
+    string error = "";
+
+
+    private void handleAgeChange(ChangeEventArgs e)
+    {
+        this.age = Convert.ToInt32(e.Value);
+    }
+
+    private void handleNameChange(ChangeEventArgs e)
+    {
+        this.name = e.Value.ToString();
+    }
+
+    private void handlePriceChange(ChangeEventArgs e)
+    {
+        this.price = Convert.ToInt32(e.Value);
+    }
+
+
+    private async Task handleSubmit()
+    {
+        this.error = "";
+
+        if (this.name == "")
+        {
+            this.error = "имя не может быть пустым";
+        }
+
+        try
+        {
+            await toyService.CreateToy(this.name, this.age, this.price);
+            navigationManager.NavigateTo("/");
+        }
+        catch (Exception e)
+        {
+            this.error = e.Message;
+        }
+    }
+}

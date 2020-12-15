@@ -1,0 +1,93 @@
+﻿@page "/solution"
+
+@using BlazorApp1.Data;
+@inject ToyService toyService;
+
+<h1>Решение</h1>
+
+<div class="row">
+    <div class="col-xs-12 col-md-4">
+        <label>
+            Цена
+
+            <input type="number"
+                   class="form-control"
+                   value="@this.priceSearch"
+                   @onchange="@this.handlePriceChange" />
+        </label>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-12 col-md-4">
+        <label>
+            Возраст
+
+            <input type="number"
+                   class="form-control"
+                   value="@this.ageSearch"
+                   @onchange="@this.handleAgeChange" />
+        </label>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-12 col-md-4">
+        <button type="button" class="btn btn-primary" @onclick="@this.updateToys">Найти</button>
+    </div>
+</div>
+
+
+@if (toys == null)
+{
+    <p>Loading....</p>
+}
+else
+{
+    <table class="table mt-5">
+        <thead>
+            <tr>
+                <th>Имя</th>
+                <th>id</th>
+                <th>Минимальный возраст</th>
+                <th>Цена</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var toy in toys)
+            {
+                <tr>
+                    <td>@toy.Name</td>
+                    <td>@toy.Id</td>
+                    <td>@toy.Age</td>
+                    <td>@toy.Price</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private int priceSearch = 0;
+    private int ageSearch = 0;
+
+    private List<Data.dto.ToyDto> toys;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await this.updateToys();
+    }
+
+    private async Task updateToys()
+    {
+        this.toys = await toyService.GetToyByParams(this.ageSearch, this.priceSearch);
+    }
+
+    private void handleAgeChange(ChangeEventArgs e)
+    {
+        this.ageSearch = Convert.ToInt32(e.Value);
+    }
+
+    private void handlePriceChange(ChangeEventArgs e)
+    {
+        this.priceSearch = Convert.ToInt32(e.Value);
+    }
+}
