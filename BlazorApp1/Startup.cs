@@ -1,4 +1,5 @@
 using BlazorApp1.Data;
+using BlazorApp1.Data.persistance;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Hosting;
@@ -27,10 +28,19 @@ namespace BlazorApp1
             services.AddRazorPages();
             services.AddServerSideBlazor();
 
-            var toyService = new ToyService();
-            toyService.Initialize().Wait();
+            var carDB = new CarDatabase();
+            var driverDB = new DriverDatabase();
 
-            services.AddSingleton(toyService);
+            var carsInitTask = carDB.Connect();
+            var driversInitTask = driverDB.Connect();
+
+            Task.WaitAll(carsInitTask, driversInitTask);
+
+            var carService = new CarService(carDB, driverDB);
+            var driverService = new DriverService(driverDB);
+
+            services.AddSingleton(carService);
+            services.AddSingleton(driverService);
 
             services.AddCors();
         }

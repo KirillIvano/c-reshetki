@@ -1,0 +1,68 @@
+﻿@page "/car/show/{Id:int}"
+
+@using BlazorApp1.Data;
+@inject CarService carService;
+@inject NavigationManager navigationManager;
+
+@if (error != "")
+{
+    <p style="color: red">@error</p>
+}
+
+@if (car == null)
+{
+    <p>Loading....</p>
+}
+else
+{
+    <h1>Машина "@car.Model"</h1>
+
+    <div class="row">
+        <ul>
+            <li>id: @car.Id</li>
+            <li>модель: @car.Model</li>
+            <li>водитель: @car.DriverId</li>
+            <li>цвет: @car.Color</li>
+        </ul>
+    </div>
+    <div class="row">
+        <div class="col-xs-2">
+            <NavLink class="nav-link" style="padding: 0" href="@($"/car/update/{Id}")" Match="NavLinkMatch.All">
+                <button type="button" class="btn btn-primary">Изменить</button>
+            </NavLink>
+        </div>
+
+        <div class="col-xs-2">
+            <button type="button" class="btn btn-danger ml-1" @onclick="@DeleteCar">Удалить</button>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    string error = "";
+
+    Data.dto.CarDto car;
+
+    protected override async Task OnInitializedAsync()
+    {
+        car = await carService.GetCarById(Id);
+    }
+
+    private async void DeleteCar()
+    {
+        error = "";
+
+        try
+        {
+            await carService.DeleteCar(Id);
+        }
+        catch (Exception e)
+        {
+            this.error = e.Message;
+        }
+        navigationManager.NavigateTo("/");
+    }
+}

@@ -1,42 +1,44 @@
 ﻿@page "/solution"
 
 @using BlazorApp1.Data;
-@inject ToyService toyService;
+@inject CarService carService;
 
 <h1>Решение</h1>
 
 <div class="row">
     <div class="col-xs-12 col-md-4">
         <label>
-            Цена
+            Модель
 
-            <input type="number"
+            <input type="text"
                    class="form-control"
-                   value="@this.priceSearch"
-                   @onchange="@this.handlePriceChange" />
+                   value="@this.modelSearch"
+                   @onchange="@this.handleModelChange" />
         </label>
     </div>
 </div>
 <div class="row">
     <div class="col-xs-12 col-md-4">
         <label>
-            Возраст
+            Цвет
 
-            <input type="number"
+            <input type="text"
+                   name="color"
                    class="form-control"
-                   value="@this.ageSearch"
-                   @onchange="@this.handleAgeChange" />
+                   value="@this.colorSearch"
+                   @onchange="@this.handleColorChange" />
+
         </label>
     </div>
 </div>
 <div class="row">
     <div class="col-xs-12 col-md-4">
-        <button type="button" class="btn btn-primary" @onclick="@this.updateToys">Найти</button>
+        <button type="button" class="btn btn-primary" @onclick="@this.updateCars">Найти</button>
     </div>
 </div>
 
 
-@if (toys == null)
+@if (cars == null)
 {
     <p>Loading....</p>
 }
@@ -45,49 +47,51 @@ else
     <table class="table mt-5">
         <thead>
             <tr>
-                <th>Имя</th>
                 <th>id</th>
-                <th>Минимальный возраст</th>
-                <th>Цена</th>
+                <th>Модель</th>
+                <th>Цвет</th>
+                <th>Имя водителя</th>
+                <th>Адрес водителя</th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var toy in toys)
+            @foreach (var car in cars)
             {
-                <tr>
-                    <td>@toy.Name</td>
-                    <td>@toy.Id</td>
-                    <td>@toy.Age</td>
-                    <td>@toy.Price</td>
-                </tr>
+            <tr>
+                <td>@car.Id</td>
+                <td>@car.Model</td>
+                <td>@car.Color</td>
+                <td>@car.DriverName</td>
+                <td>@car.DriverAddress</td>
+            </tr>
             }
         </tbody>
     </table>
 }
 
 @code {
-    private int priceSearch = 0;
-    private int ageSearch = 0;
+    private string modelSearch = "";
+    private string colorSearch = "";
 
-    private List<Data.dto.ToyDto> toys;
+    private List<Data.dto.CarFullInfoDto> cars;
 
     protected override async Task OnInitializedAsync()
     {
-        await this.updateToys();
+        await this.updateCars();
     }
 
-    private async Task updateToys()
+    private async Task updateCars()
     {
-        this.toys = await toyService.GetToyByParams(this.ageSearch, this.priceSearch);
+        this.cars = await carService.GetCarsFullInfo(this.modelSearch, this.colorSearch);
     }
 
-    private void handleAgeChange(ChangeEventArgs e)
+    private void handleColorChange(ChangeEventArgs e)
     {
-        this.ageSearch = Convert.ToInt32(e.Value);
+        this.colorSearch = e.Value.ToString();
     }
 
-    private void handlePriceChange(ChangeEventArgs e)
+    private void handleModelChange(ChangeEventArgs e)
     {
-        this.priceSearch = Convert.ToInt32(e.Value);
+        this.modelSearch = e.Value.ToString();
     }
 }

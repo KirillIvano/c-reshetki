@@ -1,0 +1,116 @@
+﻿@page "/car/create"
+
+@using BlazorApp1.Data;
+@inject CarService carService;
+@inject DriverService driverSerice;
+@inject NavigationManager navigationManager;
+
+<h1>Создание Машины</h1>
+@if (error != "")
+{
+    <p style="color: red">@error</p>
+}
+
+
+<div class="row">
+    <div class="col-xs-12 col-md-4">
+        <label>
+            Цвет
+
+            <input type="text"
+                   name="model"
+                   value="@color"
+                   @onchange="@handleColorChange"
+                   class="form-control" />
+        </label>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-12 col-md-4">
+        <label>
+            Модель
+
+            <input type="text"
+                   name="model"
+                   value="@model"
+                   @onchange="@handleModelChange"
+                   class="form-control" />
+        </label>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-12 col-md-4">
+        <label>
+            Id водителя
+
+            <input type="number"
+                   name="driverId"
+                   value="@driverId"
+                   @onchange="@handleDriverIdChange"
+                   class="form-control" />
+        </label>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-12 col-md-4">
+        <button class="btn btn-primary" @onclick="@this.handleSubmit">Создать</button>
+    </div>
+</div>
+
+
+@code {
+    private List<Data.dto.DriverDto> drivers;
+    string model = "";
+    string color = "";
+    int driverId = 0;
+    string error = "";
+
+
+    private void handleModelChange(ChangeEventArgs e)
+    {
+        this.model = e.Value.ToString();
+    }
+
+    private void handleColorChange(ChangeEventArgs e)
+    {
+        this.color = e.Value.ToString();
+    }
+    private void handleDriverIdChange(ChangeEventArgs e)
+    {
+        this.driverId = Convert.ToInt32(e.Value);
+    }
+
+
+    private async Task handleSubmit()
+    {
+        this.error = "";
+
+        if
+            (
+                this.model == "" ||
+                this.color == "" ||
+                this.driverId == 0
+            )
+        {
+            this.error = "Все поля обязательны";
+            return;
+        }
+
+        try
+        {
+            await carService.CreateCar(
+                new Data.dto.CreateCarDto()
+                {
+                    Model = this.model,
+                    Color = this.color,
+                    DriverId = this.driverId
+                }
+            );
+            navigationManager.NavigateTo("/");
+        }
+        catch (Exception e)
+        {
+            this.error = e.Message;
+        }
+    }
+}

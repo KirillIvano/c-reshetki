@@ -1,0 +1,129 @@
+﻿@page "/car/update/{Id:int}"
+
+@using BlazorApp1.Data;
+@inject CarService carService;
+@inject NavigationManager navigationManager;
+
+<h1>Изменить водителя</h1>
+
+@if (error != "")
+{
+    <p style="color: red">@error</p>
+}
+
+<div class="row">
+    <div class="col-xs-12 col-md-4">
+        <label>
+            Цвет
+
+            <input type="text"
+                   name="model"
+                   value="@color"
+                   @onchange="@handleColorChange"
+                   class="form-control" />
+        </label>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-12 col-md-4">
+        <label>
+            Модель
+
+            <input type="text"
+                   name="model"
+                   value="@model"
+                   @onchange="@handleModelChange"
+                   class="form-control" />
+        </label>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-12 col-md-4">
+        <label>
+            Id водителя
+
+            <input type="number"
+                   name="driverId"
+                   value="@driverId"
+                   @onchange="@handleDriverIdChange"
+                   class="form-control" />
+        </label>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-12 col-md-4">
+        <button class="btn btn-primary" @onclick="@this.handleSubmit">Изменить</button>
+    </div>
+</div>
+
+
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+
+    private List<Data.dto.DriverDto> cars;
+    string model = "";
+    string color = "";
+    int driverId = 0;
+    string error = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        var car = await carService.GetCarById(Id);
+
+        this.model = car.Model;
+        this.color = car.Color;
+        this.driverId = car.DriverId;
+    }
+
+
+    private void handleModelChange(ChangeEventArgs e)
+    {
+        this.model = e.Value.ToString();
+    }
+    private void handleColorChange(ChangeEventArgs e)
+    {
+        this.color = e.Value.ToString();
+    }
+    private void handleDriverIdChange(ChangeEventArgs e)
+    {
+        this.driverId = Convert.ToInt32(e.Value);
+    }
+
+
+    private async Task handleSubmit()
+    {
+        this.error = "";
+
+        if
+            (
+                this.model == "" ||
+                this.color == "" ||
+                this.driverId == 0
+            )
+        {
+            this.error = "Все поля обязательны";
+            return;
+        }
+
+        try
+        {
+            await carService.UpdateCar(new Data.dto.UpdateCarDto()
+            {
+                Id = Id,
+                Model = model,
+                Color = color,
+                DriverId = driverId
+            });
+            navigationManager.NavigateTo("/");
+        }
+        catch (Exception e)
+        {
+            this.error = e.Message;
+        }
+
+        navigationManager.NavigateTo("/");
+    }
+}

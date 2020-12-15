@@ -1,0 +1,108 @@
+﻿@page "/driver/update/{Id:int}"
+
+@using BlazorApp1.Data;
+@inject DriverService driverService;
+@inject NavigationManager navigationManager;
+
+<h1>Изменить машину</h1>
+
+@if (error != "")
+{
+    <p style="color: red">@error</p>
+}
+
+<div class="row">
+    <div class="col-xs-12 col-md-4">
+        <label>
+            Имя
+
+            <input type="text"
+                   name="name"
+                   value="@name"
+                   @onchange="@handleNameChange"
+                   class="form-control" />
+        </label>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-12 col-md-4">
+        <label>
+            Имя
+
+            <input type="text"
+                   name="address"
+                   value="@address"
+                   @onchange="@handleAddressChange"
+                   class="form-control" />
+        </label>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-xs-12 col-md-4">
+        <button class="btn btn-primary" @onclick="@this.handleSubmit">Изменить</button>
+    </div>
+</div>
+
+
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    string address = "";
+    string name = "";
+
+    string error = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        var driver = await driverService.GetDriverById(Id);
+
+        this.name = driver.Name;
+        this.address = driver.Address;
+    }
+
+
+    private void handleNameChange(ChangeEventArgs e)
+    {
+        this.name = e.Value.ToString();
+    }
+    private void handleAddressChange(ChangeEventArgs e)
+    {
+        this.address = e.Value.ToString();
+    }
+
+
+    private async Task handleSubmit()
+    {
+        this.error = "";
+
+        if
+            (
+                this.name == "" ||
+                this.address == ""
+            )
+        {
+            this.error = "Все поля обязательны";
+            return;
+        }
+
+        try
+        {
+            await driverService.UpdateDriver(new Data.dto.UpdateDriverDto()
+            {
+                Id = Id,
+                Name = name,
+                Address = address
+               
+            });
+
+            navigationManager.NavigateTo("/drivers");
+        }
+        catch (Exception e)
+        {
+            this.error = e.Message;
+        }
+    }
+}

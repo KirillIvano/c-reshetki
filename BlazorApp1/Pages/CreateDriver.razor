@@ -1,0 +1,97 @@
+﻿@page "/driver/create"
+
+@using BlazorApp1.Data;
+@inject DriverService driverSerice;
+@inject NavigationManager navigationManager;
+
+<h1>Создание водителя</h1>
+
+@if (error != "")
+{
+    <p style="color: red">@error</p>
+}
+
+<div class="row">
+    <div class="col-xs-12 col-md-4">
+        <label>
+            Имя
+
+            <input type="text"
+                   name="name"
+                   value="@name"
+                   @onchange="@handleNameChange"
+                   class="form-control" />
+        </label>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-xs-12 col-md-4">
+        <label>
+            Адрес
+
+            <input type="text"
+                   name="model"
+                   value="@address"
+                   @onchange="@handleAddressChange"
+                   class="form-control" />
+        </label>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-xs-12 col-md-4">
+        <button class="btn btn-primary" @onclick="@this.handleSubmit">Создать</button>
+    </div>
+</div>
+
+
+@code {
+    private List<Data.dto.DriverDto> drivers;
+    string address = "";
+    string name = "";
+
+    string error = "";
+
+
+
+    private void handleNameChange(ChangeEventArgs e)
+    {
+        this.name = e.Value.ToString();
+    }
+    private void handleAddressChange(ChangeEventArgs e)
+    {
+        this.address = e.Value.ToString();
+    }
+
+    private async Task handleSubmit()
+    {
+        this.error = "";
+
+        if
+            (
+                this.name == "" ||
+                this.address == ""
+            )
+        {
+            this.error = "Все поля обязательны";
+            return;
+        }
+
+        try
+        {
+            await driverSerice.CreateDriver(
+                new Data.dto.CreateDriverDto()
+                {
+                    Name = this.name,
+                    Address = this.address
+                }
+            );
+            navigationManager.NavigateTo("/drivers");
+        }
+        catch (Exception e)
+        {
+            this.error = e.Message;
+        }
+    }
+}

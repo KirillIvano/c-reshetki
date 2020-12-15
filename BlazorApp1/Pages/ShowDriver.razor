@@ -1,0 +1,68 @@
+﻿@page "/driver/show/{Id:int}"
+
+@using BlazorApp1.Data;
+@inject DriverService driverService;
+@inject NavigationManager navigationManager;
+
+@if (error != "")
+{
+    <p style="color: red">@error</p>
+}
+
+@if (driver == null)
+{
+    <p>Loading....</p>
+}
+else
+{
+    <h1>Водитель "@driver.Name"</h1>
+
+    <div class="row">
+        <ul>
+            <li>имя: @driver.Name</li>
+            <li>id: @driver.Id</li>
+            <li>адрес: @driver.Address</li>
+        </ul>
+    </div>
+    <div class="row">
+        <div class="col-xs-2">
+            <NavLink class="nav-link" style="padding: 0" href="@($"/driver/update/{Id}")" Match="NavLinkMatch.All">
+                <button type="button" class="btn btn-primary">Изменить</button>
+            </NavLink>
+        </div>
+
+        <div class="col-xs-2">
+            <button type="button" class="btn btn-danger ml-1" @onclick="@DeleteDriver">Удалить</button>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    string error = "";
+
+    Data.dto.DriverDto driver;
+
+    protected override async Task OnInitializedAsync()
+    {
+        driver = await driverService.GetDriverById(Id);
+    }
+
+    private async void DeleteDriver()
+    {
+        error = "";
+
+        try
+        {
+            await driverService.DeleteDriver(Id);
+        }
+        catch (Exception e)
+        {
+            this.error = e.Message;
+        }
+
+        navigationManager.NavigateTo("/drivers");
+    }
+}
