@@ -12,7 +12,7 @@ namespace BlazorApp1.Data.dao
     {
         static private readonly string DATABASE_PATH = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "cars.txt");
 
-        public static async Task<Storage<CarEntity>> ReadCars()
+        public async Task<Storage<CarEntity>> ReadCars()
         {
             if (!File.Exists(DATABASE_PATH))
             {
@@ -25,14 +25,14 @@ namespace BlazorApp1.Data.dao
             return drivers;
         }
         
-        private static async Task CreateTable()
+        private async Task CreateTable()
         {
             var storage = new Storage<CarEntity>();
 
             await SaveCars(storage);
         }
 
-        public static async Task SaveCars(Storage<CarEntity> toys)
+        public async Task SaveCars(Storage<CarEntity> toys)
         {
             string serializedToys = JsonSerializer.Serialize(toys);
 

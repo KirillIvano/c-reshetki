@@ -13,10 +13,16 @@ namespace BlazorApp1.Data.persistance
     public class DriverDatabase : IDriversDatabase
     {
         private Storage<DriverEntity> DriversTable;
+        private DriversDao driversDao;
+
+        public DriverDatabase()
+        {
+            this.driversDao = new DriversDao();
+        }
 
         public async Task Connect()
         {
-            DriversTable = await DriversDao.ReadDrivers();
+            DriversTable = await this.driversDao.ReadDrivers();
         }
 
         private DriverEntity GetDriverById(int driverId)
@@ -115,7 +121,7 @@ namespace BlazorApp1.Data.persistance
 
         private async Task UpdateDatabase()
         {
-            await DriversDao.SaveDrivers(DriversTable);
+            await this.driversDao.SaveDrivers(DriversTable);
         }
 
         private static DriverDto ClientifyDriver(DriverEntity driver)

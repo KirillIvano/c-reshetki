@@ -13,10 +13,16 @@ namespace BlazorApp1.Data.persistance
     public class CarDatabase : ICarsDatabase
     {
         private Storage<CarEntity> CarsTable;
+        private readonly CarsDao carsDao;
+
+        public CarDatabase()
+        {
+            this.carsDao = new CarsDao();
+        }
 
         public async Task Connect()
         {
-            CarsTable = await CarsDao.ReadCars();
+            CarsTable = await carsDao.ReadCars();
         }
 
         private CarEntity GetCarById(int carId)
@@ -118,7 +124,7 @@ namespace BlazorApp1.Data.persistance
 
         private async Task UpdateDatabase()
         {
-            await CarsDao.SaveCars(CarsTable);
+            await carsDao.SaveCars(CarsTable);
         }
 
         private static CarDto ClientifyCar(CarEntity car)
